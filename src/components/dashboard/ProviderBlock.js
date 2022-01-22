@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Icon, Tag } from 'rsuite';
 import { auth } from '../../misc/firebase';
+import firebase from 'firebase/app';
 
 const ProviderBlock = () => {
   const [isConnected, setIsConnected] = useState({
@@ -13,38 +14,50 @@ const ProviderBlock = () => {
   });
 
   const updateIsConnected = (providerId, value) => {
-      setIsConnected(p => {
-          return {
-              ...p,
-              [providerId]: value,
-          }
-      })
-  }
+    setIsConnected(p => {
+      return {
+        ...p,
+        [providerId]: value,
+      };
+    });
+  };
 
-
-  const unlink = async (providerId) => {
-    
+  const unlink = async providerId => {
     try {
-        if(auth.currentUser.providerData.length === 1) {
-            throw new Error(`You cannot disconnect from ${providerId}`, 4000);
-        }
-       await auth.currentUser.unlink(providerId);
-       updateIsConnected(providerId, false);
-       Alert.info(`Disconnected from ${providerId}`)
+      if (auth.currentUser.providerData.length === 1) {
+        throw new Error(`You cannot disconnect from ${providerId}`, 4000);
+      }
+      await auth.currentUser.unlink(providerId);
+      updateIsConnected(providerId, false);
+      Alert.info(`Disconnected from ${providerId}`);
     } catch (err) {
-        Alert.error(err.message, 4000);
+      Alert.error(err.message, 4000);
     }
-
-  }
+  };
 
   const unlinkFacebook = () => {
-      unlink('facebook.com')
+    unlink('facebook.com');
   };
   const unlinkGoogle = () => {
-      unlink('google.com')
+    unlink('google.com');
   };
-  const linkFacebook = () => {};
-  const linkGoogle = () => {};
+
+  const link = async provider => {
+    try {
+      await auth.currentUser.linkWithPopup(provider);
+      Alert.info(`Linked to ${provider.providerId}`, 4000);
+      updateIsConnected(provider.providerId, true);
+    } catch (err) {
+      Alert.error(err.message, 4000);
+    }
+  };
+
+  const linkFacebook = () => {
+    link(new firebase.auth.FacebookAuthProvider());
+  };
+  const linkGoogle = () => {
+    link(new firebase.auth.GoogleAuthProvider());
+  };
 
   return (
     <div>
@@ -58,15 +71,15 @@ const ProviderBlock = () => {
           <Icon icon="facebook" /> Connected
         </Tag>
       )}
-{/* 12:23 pause */}
+      {/* 12:23 pause */}
       <div className="mt-2">
         {!isConnected['google.com'] && (
-          <Button block color="red">
+          <Button block color="red" onClick={linkGoogle}>
             Link to Google
           </Button>
         )}
         {!isConnected['facebook.com'] && (
-          <Button block color="blue">
+          <Button block color="blue" onClick={linkFacebook}>
             Link to Facebook
           </Button>
         )}
