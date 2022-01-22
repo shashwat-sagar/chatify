@@ -8,6 +8,7 @@ import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import { ProfileProvider } from './context/profile.contex';
 
+
 function App() {
   return (
     <ProfileProvider>
