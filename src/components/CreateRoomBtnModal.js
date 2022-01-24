@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import {
+  Alert,
   Button,
   ControlLabel,
   Form,
@@ -10,6 +11,8 @@ import {
   Schema,
 } from 'rsuite';
 import { useModalState } from '../misc/custom-hooks';
+import firebase from 'firebase/app';
+import { database } from '../misc/firebase';
 
 const { StringType } = Schema.Types;
 
@@ -38,6 +41,25 @@ const onSubmit = async () => {
 
     if(!formRef.current.check()) {
         return;
+    }
+
+    setIsLoading(true); 
+
+    const newRoomdata = {
+      ...formValue,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    }
+
+    try {
+      await database.ref('rooms').push(newRoomdata);
+      setIsLoading(false);
+      setFormValue(INITIAL_FORM);
+      close();
+      Alert.info(`${formValue.name} has been created`, 4000);
+      
+    } catch (err) {
+      setIsLoading(false);
+      Alert.error(err.message, 4000);
     }
 }
 
@@ -68,7 +90,7 @@ const onSubmit = async () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button block appearance="primary">
+          <Button block appearance="primary" onClick={onSubmit} disabled={isLoading}>
             Create new chat room
           </Button>
         </Modal.Footer>
