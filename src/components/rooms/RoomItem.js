@@ -15,7 +15,7 @@ const { createdAt, name } = room;
       <div className="d-flex align-items-center text-black-70">
         <span>No messages yet...</span>
       </div>
-    </div>
+    </div>  
   );
 };
 
