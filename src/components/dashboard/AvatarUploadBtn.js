@@ -5,9 +5,7 @@ import { useModalState } from '../../misc/custom-hooks';
 import { database, storage } from '../../misc/firebase';
 import { useProfile } from '../../context/profile.contex';
 import ProfileAvatar from '../ProfileAvatar';
-
-
-
+import { getUserUpdates } from '../../misc/helpers';
 
 const fileInputTypes = '.png, .jpeg, .jpg';
 
@@ -56,29 +54,39 @@ const AvatarUploadBtn = () => {
     setIsLoading(true);
     try {
       const blob = await getBlob(canvas);
-      const avatarFileRef = storage.ref(`/profile/${profile.uid}`).child('avatar');
-      const uploadAvatarResult = await avatarFileRef.put( blob, {
-          cacheControl: `public, max-age=${3600 * 24 * 3}`
-      } );
+      const avatarFileRef = storage
+        .ref(`/profile/${profile.uid}`)
+        .child('avatar');
+      const uploadAvatarResult = await avatarFileRef.put(blob, {
+        cacheControl: `public, max-age=${3600 * 24 * 3}`,
+      });
 
       const downloadUrl = await uploadAvatarResult.ref.getDownloadURL();
 
-      const userAvatarRef = database.ref(`/profiles/${profile.uid}`).child('avatar');
+      const updates = await getUserUpdates(
+        profile.uid,
+        'avatar',
+        downloadUrl,
+        database
+      );
+      console.log('updates', updates)
+      await database.ref().update(updates);
 
-      userAvatarRef.set(downloadUrl);
       setIsLoading(false);
       Alert.info('avatar has been uploaded', 4000);
-
     } catch (err) {
-        setIsLoading(false);
-        Alert.error(err.message, 4000);
+      setIsLoading(false);
+      Alert.error(err.message, 4000);
     }
   };
 
   return (
     <div className="mt-3 text-center">
-       <ProfileAvatar src={profile.avatar} name={profile.name} className="width-200 height-200 img-fullsize font-huge" />
-    
+      <ProfileAvatar
+        src={profile.avatar}
+        name={profile.name}
+        className="width-200 height-200 img-fullsize font-huge"
+      />
 
       <div>
         <label
@@ -94,7 +102,7 @@ const AvatarUploadBtn = () => {
             onChange={onFileInputChange}
           />
         </label>
-        
+
         <Modal show={isOpen} onHide={close}>
           <Modal.Header>
             <Modal.Title>Adjust and Upload new avatar</Modal.Title>
@@ -115,7 +123,12 @@ const AvatarUploadBtn = () => {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button block appearance="ghost" onClick={onUploadClick} disabled={isLoading}>
+            <Button
+              block
+              appearance="ghost"
+              onClick={onUploadClick}
+              disabled={isLoading}
+            >
               Upload new avatar
             </Button>
           </Modal.Footer>
