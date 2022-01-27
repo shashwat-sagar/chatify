@@ -14,6 +14,7 @@ const Home = () => {
   const canRenderSidebar = isDesktop || isExact;
 
   return (
+    
     <RoomsProvider>
       <Grid fluid className="h-100">
         <Row className="h-100">
@@ -30,14 +31,17 @@ const Home = () => {
               </Col>
             </Route>
             <Route>
-              {isDesktop && <Col xs={24} md={16} className="h-100">
-                <h6 className="text-center mt-page">Please select chat</h6> 
-              </Col>}
+              {isDesktop && (
+                <Col xs={24} md={16} className="h-100">
+                  <h6 className="text-center mt-page">Please select chat</h6>
+                </Col>
+              )}
             </Route>
           </Switch>
         </Row>
       </Grid>
     </RoomsProvider>
+  
   );
 };
 
