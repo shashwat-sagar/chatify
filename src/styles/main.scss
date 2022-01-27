@@ -20,6 +20,12 @@ body,
   height: 100%;
 }
 
+.custom-style{
+  width: 120px;
+  padding-left: 45px;
+  margin-left: 1px;
+}
+
 .custom-scroll {
   &::-webkit-scrollbar {
     width: 4px;
