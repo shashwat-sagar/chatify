@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Button } from 'rsuite';
 import TimeAgo from 'timeago-react';
 import ProfileAvatar from '../../ProfileAvatar';
 import ProfileInfoBtnModal from './ProfileInfoBtnModal';
@@ -16,19 +16,17 @@ const MessageItem = ({ message }) => {
           className="ml-1"
           size="xs"
         />
-        <ProfileInfoBtnModal
-          profile={author}
-          appearance="link"
-          className="p-0 ml-1 text-black"
-        />
+        <ProfileInfoBtnModal profile={author} appearance="link" className="p-0 ml-1 te" />
         <TimeAgo
-          datetime={createdAt}
+          datetime={
+           createdAt
+          }
           className="font-normal text-black-45 ml-2"
         />
       </div>
 
       <div>
-        <span className="word-break-all">{text}</span>
+        <span className="word-break-all"><Button color='blue'>{text}</Button></span>
       </div>
     </li>
   );
